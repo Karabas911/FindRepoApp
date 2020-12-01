@@ -7,6 +7,9 @@ import com.karabas.findrepoapp.network.GitHubRepositoryImpl
 class ListViewModel(private val repo: GitHubRepository) : ViewModel() {
 
     init {
-        repo.findRepoByName("Hello")
+    }
+
+    fun startRepoSearch(searchQuery: String){
+        repo.findRepoByName(searchQuery)
     }
 }
