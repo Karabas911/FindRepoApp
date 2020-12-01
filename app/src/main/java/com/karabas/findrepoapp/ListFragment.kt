@@ -1,11 +1,11 @@
 package com.karabas.findrepoapp
 
-import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class ListFragment : Fragment() {
 
@@ -13,7 +13,7 @@ class ListFragment : Fragment() {
         fun newInstance() = ListFragment()
     }
 
-    private lateinit var viewModel: ListViewModel
+    private val viewModel: ListViewModel by viewModel()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -24,7 +24,6 @@ class ListFragment : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        viewModel = ViewModelProvider(this).get(ListViewModel::class.java)
     }
 
 }
