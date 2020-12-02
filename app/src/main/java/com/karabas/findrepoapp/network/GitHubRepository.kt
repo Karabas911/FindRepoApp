@@ -1,7 +1,10 @@
 package com.karabas.findrepoapp.network
 
+import com.karabas.findrepoapp.model.GetRepositoryResponse
+import io.reactivex.rxjava3.core.Observable
+
 interface GitHubRepository {
 
-    fun findRepoByName(searchQuery: String)
+    fun findRepoByName(searchQuery: String): Observable<GetRepositoryResponse>
 
 }

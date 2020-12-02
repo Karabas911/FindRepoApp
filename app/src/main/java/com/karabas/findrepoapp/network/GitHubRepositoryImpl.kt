@@ -1,40 +1,24 @@
 package com.karabas.findrepoapp.network
 
-import android.util.Log
 import com.karabas.findrepoapp.model.GetRepositoryResponse
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.kotlin.subscribeBy
-import io.reactivex.rxjava3.schedulers.Schedulers
+import io.reactivex.rxjava3.core.Observable
 
 
 class GitHubRepositoryImpl(private val gitHubService: GitHubService) : GitHubRepository {
 
     companion object {
         private const val TAG = "GitHubRepositoryImpl"
+        private const val REQUEST_QUERY_SORT_TYPE = "stars"
+        private const val REQUEST_QUERY_ORDER = "desc"
+        private const val REQUEST_QUERY_COUNT = 15
     }
 
-
-    override fun findRepoByName(searchQuery: String) {
-        val reposObservable = gitHubService.findRepoByName(
+    override fun findRepoByName(searchQuery: String): Observable<GetRepositoryResponse> {
+        return gitHubService.findRepoByName(
             searchQuery,
-            "stars",
-            "desc",
-            15
+            REQUEST_QUERY_SORT_TYPE,
+            REQUEST_QUERY_ORDER,
+            REQUEST_QUERY_COUNT
         )
-        reposObservable
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onError = { Log.e(TAG, "error", it) },
-                onNext = {
-                    handleResponse(it)
-                }
-            )
-    }
-
-    private fun handleResponse(response: GetRepositoryResponse) {
-        response.items.forEach { item ->
-            Log.d(TAG, item.toString())
-        }
     }
 }
