@@ -5,6 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.karabas.findrepoapp.model.Repository
+import com.karabas.findrepoapp.model.RepositoryRemote
 import com.karabas.findrepoapp.network.GitHubRepository
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.kotlin.subscribeBy
@@ -29,14 +30,18 @@ class ListViewModel(private val repo: GitHubRepository) : ViewModel() {
         // Load rest 15 items from page 2
         val secondResult = repo.findRepoByName(searchQuery, REPO_LIST_PAGE_NUMBER_2)
 
-        val resultList = arrayListOf<Repository>()
         firsResult
-            .mergeWith(secondResult)
+            .zipWith(secondResult) { first, second ->
+                val joinedList = arrayListOf<RepositoryRemote>()
+                joinedList.addAll(first.items)
+                joinedList.addAll(second.items)
+                joinedList
+            }
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .map { response ->
+            .map { joinedResponseList ->
                 val repositoryList = arrayListOf<Repository>()
-                response.items.forEach { repoRemote ->
+                joinedResponseList.forEach { repoRemote ->
                     Log.d(TAG, "Repo name = ${repoRemote.name}, score = ${repoRemote.score}")
                     repositoryList.add(
                         Repository(
@@ -53,8 +58,7 @@ class ListViewModel(private val repo: GitHubRepository) : ViewModel() {
                     Log.e(TAG, "error", throwable)
                     repoLiveData.value = Resource.error(msg = throwable.localizedMessage)
                 },
-                onNext = { resultList.addAll(it) },
-                onComplete = { repoLiveData.value = Resource.success(resultList) }
+                onNext = { repoLiveData.value = Resource.success(it) },
             )
     }
 }
