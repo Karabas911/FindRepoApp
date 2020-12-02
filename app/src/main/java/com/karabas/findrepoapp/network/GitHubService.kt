@@ -12,7 +12,8 @@ interface GitHubService {
         @Query("q") searchQuery: String,
         @Query("sort") sortType: String,
         @Query("order") order: String,
-        @Query("per_page") itemCount: Int
+        @Query("per_page") itemCount: Int,
+        @Query("page") pageNumber: Int,
     ): Observable<GetRepositoryResponse>
 
 

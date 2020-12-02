@@ -13,12 +13,13 @@ class GitHubRepositoryImpl(private val gitHubService: GitHubService) : GitHubRep
         private const val REQUEST_QUERY_COUNT = 15
     }
 
-    override fun findRepoByName(searchQuery: String): Observable<GetRepositoryResponse> {
+    override fun findRepoByName(searchQuery: String, pageNumber: Int): Observable<GetRepositoryResponse> {
         return gitHubService.findRepoByName(
             searchQuery,
             REQUEST_QUERY_SORT_TYPE,
             REQUEST_QUERY_ORDER,
-            REQUEST_QUERY_COUNT
+            REQUEST_QUERY_COUNT,
+            pageNumber
         )
     }
 }

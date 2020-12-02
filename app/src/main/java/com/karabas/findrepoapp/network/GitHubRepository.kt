@@ -5,6 +5,6 @@ import io.reactivex.rxjava3.core.Observable
 
 interface GitHubRepository {
 
-    fun findRepoByName(searchQuery: String): Observable<GetRepositoryResponse>
+    fun findRepoByName(searchQuery: String, pageNumber: Int): Observable<GetRepositoryResponse>
 
 }

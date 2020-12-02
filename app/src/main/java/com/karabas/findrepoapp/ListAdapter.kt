@@ -10,7 +10,7 @@ class ListAdapter : RecyclerView.Adapter<ListAdapter.ViewHolder>() {
 
     private var repoList = emptyList<Repository>()
 
-    fun updateRepos(repoList: List<Repository>){
+    fun updateRepos(repoList: List<Repository>) {
         this.repoList = repoList
         notifyDataSetChanged()
     }
@@ -32,14 +32,14 @@ class ListAdapter : RecyclerView.Adapter<ListAdapter.ViewHolder>() {
     override fun getItemCount() = repoList.size
 
     class ViewHolder(private val binding: ItemRepoBinding) :
-        RecyclerView.ViewHolder(binding.root){
+        RecyclerView.ViewHolder(binding.root) {
 
         fun bind(repository: Repository) {
-               binding.run {
-                   repoName.text = repository.name
-                   language.text = "Language: ${repository.language}"
-                   rating.text = repository.score.toString()
-               }
+            binding.run {
+                repoName.text = repository.name
+                language.text = "Language: ${repository.language ?: "-"}"
+                rating.text = repository.score.toString()
+            }
         }
     }
 }

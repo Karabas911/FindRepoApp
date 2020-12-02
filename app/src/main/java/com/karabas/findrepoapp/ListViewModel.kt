@@ -14,6 +14,8 @@ class ListViewModel(private val repo: GitHubRepository) : ViewModel() {
 
     companion object {
         const val TAG = "ListViewModel"
+        const val REPO_LIST_PAGE_NUMBER_1 = 1
+        const val REPO_LIST_PAGE_NUMBER_2 = 2
     }
 
     private val repoLiveData = MutableLiveData<Resource<List<Repository>>>()
@@ -22,13 +24,20 @@ class ListViewModel(private val repo: GitHubRepository) : ViewModel() {
 
     fun startRepoSearch(searchQuery: String) {
         repoLiveData.value = Resource.loading()
-        repo.findRepoByName(searchQuery)
+        // Load first 15 items from page 1
+        val firsResult = repo.findRepoByName(searchQuery, REPO_LIST_PAGE_NUMBER_1)
+        // Load rest 15 items from page 2
+        val secondResult = repo.findRepoByName(searchQuery, REPO_LIST_PAGE_NUMBER_2)
+
+        val resultList = arrayListOf<Repository>()
+        firsResult
+            .mergeWith(secondResult)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .map { response ->
                 val repositoryList = arrayListOf<Repository>()
                 response.items.forEach { repoRemote ->
-                    Log.d(TAG,"Repo name = ${repoRemote.name}, score = ${repoRemote.score}")
+                    Log.d(TAG, "Repo name = ${repoRemote.name}, score = ${repoRemote.score}")
                     repositoryList.add(
                         Repository(
                             repoRemote.fullName,
@@ -44,7 +53,8 @@ class ListViewModel(private val repo: GitHubRepository) : ViewModel() {
                     Log.e(TAG, "error", throwable)
                     repoLiveData.value = Resource.error(msg = throwable.localizedMessage)
                 },
-                onNext = { repoLiveData.value = Resource.success(it) }
+                onNext = { resultList.addAll(it) },
+                onComplete = { repoLiveData.value = Resource.success(resultList) }
             )
     }
 }
