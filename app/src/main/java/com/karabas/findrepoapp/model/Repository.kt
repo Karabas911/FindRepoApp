@@ -4,8 +4,8 @@ data class Repository(
 
     val name: String,
 
-    val language: String,
+    val language: String?,
 
-    val score: Double
+    val score: Int
 
 )

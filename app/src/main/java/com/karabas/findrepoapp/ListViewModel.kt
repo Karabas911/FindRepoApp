@@ -18,20 +18,22 @@ class ListViewModel(private val repo: GitHubRepository) : ViewModel() {
 
     private val repoLiveData = MutableLiveData<Resource<List<Repository>>>()
 
-    private fun getRepoLiveData(): LiveData<Resource<List<Repository>>> = repoLiveData
+    fun getRepoLiveData(): LiveData<Resource<List<Repository>>> = repoLiveData
 
     fun startRepoSearch(searchQuery: String) {
+        repoLiveData.value = Resource.loading()
         repo.findRepoByName(searchQuery)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .map { response ->
                 val repositoryList = arrayListOf<Repository>()
                 response.items.forEach { repoRemote ->
+                    Log.d(TAG,"Repo name = ${repoRemote.name}, score = ${repoRemote.score}")
                     repositoryList.add(
                         Repository(
                             repoRemote.fullName,
                             repoRemote.language,
-                            repoRemote.score
+                            repoRemote.stargazersCount
                         )
                     )
                 }
