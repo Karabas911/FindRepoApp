@@ -28,17 +28,18 @@ class ListViewModel(private val repo: GitHubRepository) : ViewModel() {
         // Load first 15 items from page 1
         val firsResult = repo.findRepoByName(searchQuery, REPO_LIST_PAGE_NUMBER_1)
         // Load rest 15 items from page 2
-        val secondResult = repo.findRepoByName(searchQuery, REPO_LIST_PAGE_NUMBER_2)
+        var secondResult = repo
+            .findRepoByName(searchQuery, REPO_LIST_PAGE_NUMBER_2)
+            .subscribeOn(Schedulers.newThread())
 
         firsResult
+            .subscribeOn(Schedulers.io())
             .zipWith(secondResult) { first, second ->
                 val joinedList = arrayListOf<RepositoryRemote>()
                 joinedList.addAll(first.items)
                 joinedList.addAll(second.items)
                 joinedList
             }
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
             .map { joinedResponseList ->
                 val repositoryList = arrayListOf<Repository>()
                 joinedResponseList.forEach { repoRemote ->
@@ -53,6 +54,7 @@ class ListViewModel(private val repo: GitHubRepository) : ViewModel() {
                 }
                 repositoryList
             }
+            .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onError = { throwable ->
                     Log.e(TAG, "error", throwable)
